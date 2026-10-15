@@ -13,6 +13,7 @@ from src.exporters.icom_id52 import (
     _to_ascii,
     _dup_and_offset,
     export_csv,
+    export_split,
     filter_for_id52,
 )
 from src.models import Band, Mode, Repeater, Status
@@ -217,3 +218,46 @@ class TestExportCsv:
             next(reader)
             row = next(reader)
             assert row[CSV_HEADER.index("RPT1USE")] == "Yes"
+
+
+class TestExportSplit:
+    def test_one_file_per_voivodeship(self, tmp_path: Path):
+        rpts = [
+            _make_rpt(voivodeship="Mazowieckie"),
+            _make_rpt(call="SR5Y", voivodeship="Mazowieckie"),
+            _make_rpt(call="SR6Y", voivodeship="Dolnoslaskie"),
+        ]
+        counts = export_split(rpts, tmp_path)
+        assert counts == {"01_Dolnoslaskie.csv": 1, "02_Mazowieckie.csv": 2}
+        assert sorted(p.name for p in tmp_path.iterdir()) == list(counts)
+
+    def test_group_numbers_match_combined_export(self, tmp_path: Path):
+        rpts = [
+            _make_rpt(voivodeship="Mazowieckie"),
+            _make_rpt(call="SR6Y", voivodeship="Dolnoslaskie"),
+        ]
+        combined = tmp_path / "all.csv"
+        export_csv(rpts, combined)
+        export_split(rpts, tmp_path / "split")
+
+        with open(combined) as f:
+            combined_rows = list(csv.reader(f))[1:]
+        split_rows = []
+        for p in sorted((tmp_path / "split").iterdir()):
+            with open(p) as f:
+                reader = csv.reader(f)
+                assert next(reader) == CSV_HEADER
+                split_rows.extend(reader)
+        assert split_rows == combined_rows
+
+    def test_filtered_out_repeaters_skipped(self, tmp_path: Path):
+        rpts = [
+            _make_rpt(voivodeship="Mazowieckie"),
+            _make_rpt(call="SR6Y", mode=Mode.DMR, voivodeship="Dolnoslaskie"),
+        ]
+        counts = export_split(rpts, tmp_path)
+        assert counts == {"01_Mazowieckie.csv": 1}
+
+    def test_empty_input_writes_nothing(self, tmp_path: Path):
+        assert export_split([], tmp_path / "split") == {}
+        assert not (tmp_path / "split").exists()

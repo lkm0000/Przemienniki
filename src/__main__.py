@@ -7,7 +7,7 @@ import logging
 import sys
 from pathlib import Path
 
-from src.exporters.icom_id52 import export_csv
+from src.exporters.icom_id52 import export_csv, export_split
 from src.merge import merge_repeaters
 from src.sources.mapy73 import fetch_and_parse as fetch_mapy73
 from src.sources.rxf import fetch_and_parse as fetch_rxf
@@ -26,6 +26,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--output", type=Path, default=Path("output/przemienniki_id52.csv"),
         help="Output CSV path (default: output/przemienniki_id52.csv)",
+    )
+    parser.add_argument(
+        "--split-dir", type=Path, default=None,
+        help="Also write one CSV per voivodeship into this directory",
     )
     parser.add_argument(
         "--force", action="store_true",
@@ -73,11 +77,17 @@ def main(argv: list[str] | None = None) -> int:
     output_path: Path = args.output
     count = export_csv(merged, output_path)
 
+    split_counts: dict[str, int] = {}
+    if args.split_dir is not None:
+        split_counts = export_split(merged, args.split_dir)
+
     # --- Report ---
     log.info("=== Report ===")
     log.info("Total merged: %d", len(merged))
     log.info("Exported to CSV: %d", count)
     log.info("Output: %s", output_path)
+    if split_counts:
+        log.info("Per-voivodeship files: %d in %s", len(split_counts), args.split_dir)
 
     # Mode breakdown
     from collections import Counter

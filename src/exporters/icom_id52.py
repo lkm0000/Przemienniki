@@ -154,6 +154,49 @@ def filter_for_id52(repeaters: list[Repeater]) -> list[Repeater]:
     ]
 
 
+def _build_row(group_no: int, group_name: str, rpt: Repeater) -> list:
+    """Build one ID-52 CSV row for a repeater."""
+    dup, offset = _dup_and_offset(rpt)
+    mode_str = "DV" if rpt.mode == Mode.DSTAR else "FM"
+
+    tone = ""
+    repeater_tone = ""
+    if rpt.mode == Mode.FM and rpt.ctcss:
+        tone = "TONE"
+        repeater_tone = f"{rpt.ctcss:g} Hz"
+
+    position = "Approximate" if (rpt.latitude is not None and rpt.longitude is not None) else ""
+
+    return [
+        group_no,
+        group_name,
+        _make_name(rpt),
+        _make_sub_name(rpt),
+        _repeater_callsign(rpt),
+        _gateway_callsign(rpt),
+        _format_freq(rpt.tx_mhz),
+        dup,
+        offset,
+        mode_str,
+        tone,
+        repeater_tone,
+        "Yes",
+        position,
+        _format_lat(rpt.latitude),
+        _format_lon(rpt.longitude),
+        "+1:00",
+    ]
+
+
+def _write_csv(output_path: Path, rows: list[list]) -> None:
+    """Write header + rows to a CSV file, creating parent dirs."""
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(CSV_HEADER)
+        writer.writerows(rows)
+
+
 def export_csv(repeaters: list[Repeater], output_path: Path) -> int:
     """Export repeaters to ID-52 CSV format. Returns number of rows written."""
     filtered = filter_for_id52(repeaters)
@@ -162,47 +205,35 @@ def export_csv(repeaters: list[Repeater], output_path: Path) -> int:
         return 0
 
     groups = _build_groups(filtered)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
+    rows = [
+        _build_row(group_no, group_name, rpt)
+        for group_no, (group_name, group_rpts) in enumerate(groups.items(), start=1)
+        for rpt in group_rpts
+    ]
+    _write_csv(output_path, rows)
 
-    row_count = 0
-    with open(output_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow(CSV_HEADER)
+    logger.info("Exported %d repeaters to %s (%d groups)", len(rows), output_path, len(groups))
+    return len(rows)
 
-        for group_no, (group_name, group_rpts) in enumerate(groups.items(), start=1):
-            for rpt in group_rpts:
-                dup, offset = _dup_and_offset(rpt)
-                mode_str = "DV" if rpt.mode == Mode.DSTAR else "FM"
 
-                tone = ""
-                repeater_tone = ""
-                if rpt.mode == Mode.FM and rpt.ctcss:
-                    tone = "TONE"
-                    repeater_tone = f"{rpt.ctcss:g} Hz"
+def export_split(repeaters: list[Repeater], output_dir: Path) -> dict[str, int]:
+    """Export one ID-52 CSV per voivodeship into output_dir.
 
-                position = "Approximate" if (rpt.latitude is not None and rpt.longitude is not None) else ""
+    Files are named "NN_<Group Name>.csv". Group numbers match the combined
+    export, so several files can be imported without groups colliding.
+    Returns {file name: number of rows}.
+    """
+    filtered = filter_for_id52(repeaters)
+    if not filtered:
+        logger.warning("No repeaters matched ID-52 filter criteria")
+        return {}
 
-                row = [
-                    group_no,
-                    group_name,
-                    _make_name(rpt),
-                    _make_sub_name(rpt),
-                    _repeater_callsign(rpt),
-                    _gateway_callsign(rpt),
-                    _format_freq(rpt.tx_mhz),
-                    dup,
-                    offset,
-                    mode_str,
-                    tone,
-                    repeater_tone,
-                    "Yes",
-                    position,
-                    _format_lat(rpt.latitude),
-                    _format_lon(rpt.longitude),
-                    "+1:00",
-                ]
-                writer.writerow(row)
-                row_count += 1
+    groups = _build_groups(filtered)
+    counts: dict[str, int] = {}
+    for group_no, (group_name, group_rpts) in enumerate(groups.items(), start=1):
+        file_name = f"{group_no:02d}_{group_name}.csv"
+        _write_csv(output_dir / file_name, [_build_row(group_no, group_name, r) for r in group_rpts])
+        counts[file_name] = len(group_rpts)
 
-    logger.info("Exported %d repeaters to %s (%d groups)", row_count, output_path, len(groups))
-    return row_count
+    logger.info("Exported %d voivodeship files to %s", len(counts), output_dir)
+    return counts

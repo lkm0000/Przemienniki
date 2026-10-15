@@ -11,6 +11,11 @@ Pipeline generujacy plik CSV z polskimi przemiennikami do importu w radiu Icom I
 
 Najnowszy plik CSV dostepny jest w [GitHub Releases](../../releases/tag/latest) — budowany automatycznie codziennie o 01:17 UTC (03:17 czasu letniego, 02:17 zimowego).
 
+Pliki w release:
+- `przemienniki_id52.csv` — wszystkie wojewodztwa w jednym pliku
+- `NN_<Wojewodztwo>.csv` — osobny plik dla kazdego wojewodztwa (numer grupy taki sam jak w pliku zbiorczym)
+- `przemienniki_id52_wojewodztwa.zip` — wszystkie pliki wojewodzkie w jednym archiwum
+
 ## Uzycie lokalne
 
 ```bash
@@ -30,6 +35,7 @@ pytest -v
 |---|---|---|
 | `--work-dir` | `work/` | Katalog roboczy (klony repo, pobrany XML) |
 | `--output` | `output/przemienniki_id52.csv` | Sciezka wynikowego CSV |
+| `--split-dir` | brak | Dodatkowo osobny CSV dla kazdego wojewodztwa (`01_Dolnoslaskie.csv` ...) |
 | `--force` | off | Buduj niezaleznie od fingerprint |
 
 ## Pipeline

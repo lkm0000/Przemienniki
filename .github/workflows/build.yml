@@ -74,7 +74,8 @@ jobs:
       - name: Run pipeline
         if: steps.decide.outputs.skip != 'true'
         run: |
-          python -m src --work-dir work --output output/przemienniki_id52.csv --force
+          python -m src --work-dir work --output output/przemienniki_id52.csv --split-dir output/wojewodztwa --force
+          (cd output/wojewodztwa && zip -q ../przemienniki_id52_wojewodztwa.zip *.csv)
           echo "### Build Report" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "- Fingerprint: \`${{ steps.fingerprint.outputs.fingerprint }}\`" >> "$GITHUB_STEP_SUMMARY"
@@ -93,5 +94,8 @@ jobs:
 
             Fingerprint: `${{ steps.fingerprint.outputs.fingerprint }}`
             Trigger: `${{ github.event_name }}`
-          files: output/przemienniki_id52.csv
+          files: |
+            output/przemienniki_id52.csv
+            output/przemienniki_id52_wojewodztwa.zip
+            output/wojewodztwa/*.csv
           make_latest: true
