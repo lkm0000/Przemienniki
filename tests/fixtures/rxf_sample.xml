@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rxf version="1.0">
+  <updated>2026-01-15 12:00:00</updated>
+  <generated>2026-01-15 12:05:00</generated>
+  <generator>test</generator>
+  <dictionary>
+    <item><type>mode</type><name>FM</name><value>4</value></item>
+    <item><type>mode</type><name>DSTAR</name><value>32</value></item>
+    <item><type>mode</type><name>MOTOTRBO</name><value>1024</value></item>
+    <item><type>status</type><name>WORKING</name><value>1</value></item>
+  </dictionary>
+  <repeaters>
+    <!-- Polish FM repeater -->
+    <repeater>
+      <qra>SR6UVW</qra>
+      <id>1001</id>
+      <statusInt>1</statusInt>
+      <status>WORKING</status>
+      <modeInt>4</modeInt>
+      <mode>FM</mode>
+      <bandInt>16384</bandInt>
+      <band>70CM</band>
+      <qrg type="rx">431.2625</qrg>
+      <qrg type="tx">438.8625</qrg>
+      <country>pl</country>
+      <qth><![CDATA[Wroclaw]]></qth>
+      <location>
+        <locator>JO81CG</locator>
+        <latitude>51.107885</latitude>
+        <longitude>17.038538</longitude>
+      </location>
+      <activationInt>256</activationInt>
+      <activation>CTCSS</activation>
+      <ctcss type="rx">88.5</ctcss>
+      <updated>2025-06-01 10:00:00</updated>
+    </repeater>
+
+    <!-- Polish D-STAR repeater -->
+    <repeater>
+      <qra>SR6R</qra>
+      <id>1002</id>
+      <statusInt>1</statusInt>
+      <status>WORKING</status>
+      <modeInt>32</modeInt>
+      <mode>DSTAR</mode>
+      <bandInt>16384</bandInt>
+      <band>70CM</band>
+      <qrg type="rx">431.5125</qrg>
+      <qrg type="tx">439.1125</qrg>
+      <country>pl</country>
+      <qth><![CDATA[Wroclaw]]></qth>
+      <location>
+        <locator>JO81CG</locator>
+        <latitude>51.107885</latitude>
+        <longitude>17.038538</longitude>
+      </location>
+      <activationInt>4</activationInt>
+      <activation>CARRIER</activation>
+      <updated>2025-06-01 10:00:00</updated>
+    </repeater>
+
+    <!-- Polish FM+C4FM multi-mode -->
+    <repeater>
+      <qra>SR9P</qra>
+      <id>1003</id>
+      <statusInt>1</statusInt>
+      <status>WORKING</status>
+      <modeInt>4100</modeInt>
+      <mode>FM</mode>
+      <mode>C4FM</mode>
+      <bandInt>16384</bandInt>
+      <band>70CM</band>
+      <qrg type="rx">431.4625</qrg>
+      <qrg type="tx">439.0625</qrg>
+      <country>pl</country>
+      <qth><![CDATA[Krakow]]></qth>
+      <location>
+        <locator>KO00AA</locator>
+        <latitude>50.061389</latitude>
+        <longitude>19.938333</longitude>
+      </location>
+      <activationInt>288</activationInt>
+      <activation>1750</activation>
+      <activation>CTCSS</activation>
+      <ctcss type="rx">77.0</ctcss>
+      <updated>2025-07-01 10:00:00</updated>
+    </repeater>
+
+    <!-- Polish repeater with zero coordinates (should fallback to locator) -->
+    <repeater>
+      <qra>SR5DX</qra>
+      <id>1004</id>
+      <statusInt>8</statusInt>
+      <status>TESTING</status>
+      <modeInt>4</modeInt>
+      <mode>FM</mode>
+      <bandInt>4096</bandInt>
+      <band>2M</band>
+      <qrg type="rx">145.0125</qrg>
+      <qrg type="tx">145.6125</qrg>
+      <country>pl</country>
+      <qth><![CDATA[Lodz]]></qth>
+      <location>
+        <locator>KO01AB</locator>
+        <latitude>0.000000</latitude>
+        <longitude>0.000000</longitude>
+      </location>
+      <activationInt>256</activationInt>
+      <activation>CTCSS</activation>
+      <ctcss type="rx">103.5</ctcss>
+      <updated>2025-05-01 10:00:00</updated>
+    </repeater>
+
+    <!-- Polish disabled repeater -->
+    <repeater>
+      <qra>SR3OLD</qra>
+      <id>1005</id>
+      <statusInt>2</statusInt>
+      <status>DISABLED</status>
+      <modeInt>4</modeInt>
+      <mode>FM</mode>
+      <bandInt>16384</bandInt>
+      <band>70CM</band>
+      <qrg type="rx">431.9625</qrg>
+      <qrg type="tx">439.5625</qrg>
+      <country>pl</country>
+      <qth><![CDATA[Poznan]]></qth>
+      <location>
+        <locator>JO82PG</locator>
+        <latitude>52.406374</latitude>
+        <longitude>16.925168</longitude>
+      </location>
+      <updated>2024-01-01 10:00:00</updated>
+    </repeater>
+
+    <!-- Foreign repeater (should be filtered out) -->
+    <repeater>
+      <qra>DB0AAT</qra>
+      <id>2001</id>
+      <statusInt>1</statusInt>
+      <status>WORKING</status>
+      <modeInt>4</modeInt>
+      <mode>FM</mode>
+      <bandInt>16384</bandInt>
+      <band>70CM</band>
+      <qrg type="rx">431.5000</qrg>
+      <qrg type="tx">439.1000</qrg>
+      <country>de</country>
+      <qth><![CDATA[Berlin]]></qth>
+      <location>
+        <locator>JO62QM</locator>
+        <latitude>52.520008</latitude>
+        <longitude>13.404954</longitude>
+      </location>
+      <updated>2025-01-01 10:00:00</updated>
+    </repeater>
+  </repeaters>
+</rxf>

@@ -1,0 +1,61 @@
+# Sample mapy73 YAML for testing — based on real data format
+# Simulates a multi-mode repeater with FM, D-STAR, and DMR on 70cm
+
+x:
+  70cm:
+    - rx:
+        f: 431.0625
+        t:
+          - c: "94.8"
+      tx:
+        f: 438.6625
+      h: "5220302100"
+      t: a
+      s: "4"
+      p: 15
+    - rx:
+        f: 431.0625
+      tx:
+        f: 438.6625
+      h: "5220302100"
+      t: b
+      s: "4"
+      p: 15
+    - rx:
+        f: 431.0625
+        t:
+          - f: "1"
+      tx:
+        f: 438.6625
+      h: "5220302100"
+      t: e
+      s: "4"
+      p: 15
+  2m:
+    - rx:
+        f: 145.0625
+        t:
+          - b: ""
+          - c: "67.0"
+      tx:
+        f: 145.6625
+      h: "5220302100"
+      t: a
+      s: "3"
+      p: 10
+
+h:
+  "5220302100":
+    a: 52.203
+    o: 21.00
+    e: 120
+    g: 45
+    p: "Warszawa"
+    x:
+      - 70cm: 0
+      - 70cm: 1
+      - 70cm: 2
+      - 2m: 0
+
+o:
+  - SP5XXX

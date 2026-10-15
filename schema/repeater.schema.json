@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Repeater",
+  "description": "Common repeater record format used in the Przemienniki pipeline.",
+  "type": "object",
+  "required": ["call", "tx_mhz", "rx_mhz", "band", "mode"],
+  "properties": {
+    "call": {
+      "type": "string",
+      "description": "Callsign (e.g. SR5KPN)"
+    },
+    "tx_mhz": {
+      "type": "number",
+      "description": "Repeater output frequency in MHz (what the user listens to)"
+    },
+    "rx_mhz": {
+      "type": "number",
+      "description": "Repeater input frequency in MHz (what the user transmits on)"
+    },
+    "band": {
+      "type": "string",
+      "enum": ["6m", "2m", "70cm", "23cm", "13cm", "other"]
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["FM", "D-STAR", "DMR", "C4FM", "ATV", "TETRA", "APCO-25", "other"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "testing", "planned", "building", "inactive", "unknown"]
+    },
+    "latitude": { "type": ["number", "null"] },
+    "longitude": { "type": ["number", "null"] },
+    "qth_locator": { "type": ["string", "null"] },
+    "qth_city": { "type": ["string", "null"] },
+    "agl_m": { "type": ["number", "null"], "description": "Antenna height AGL in meters" },
+    "asl_m": { "type": ["number", "null"], "description": "Antenna height ASL in meters" },
+    "ctcss": { "type": ["number", "null"], "description": "CTCSS tone in Hz" },
+    "dcs_code": { "type": ["integer", "null"] },
+    "color_code": { "type": ["integer", "null"], "description": "DMR color code" },
+    "access_text": { "type": ["string", "null"] },
+    "dstar_module": { "type": ["string", "null"], "enum": ["A", "B", "C", null] },
+    "dmr_id": { "type": ["integer", "null"] },
+    "dmr_network": { "type": ["string", "null"] },
+    "source": { "type": "string" },
+    "updated": { "type": ["string", "null"] },
+    "voivodeship": { "type": ["string", "null"] },
+    "notes": { "type": ["string", "null"] }
+  }
+}

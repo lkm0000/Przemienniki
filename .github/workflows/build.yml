@@ -1,0 +1,97 @@
+name: Build & Release
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["src/**"]
+  repository_dispatch:
+    types: [refresh]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -e "."
+
+      - name: Compute fingerprint
+        id: fingerprint
+        run: |
+          # mapy73 latest commit hash
+          MAPY73_HASH=$(git ls-remote https://github.com/Hotel-Foxtrot-Tango-Echo/przemienniki-mapy73pl.git HEAD | cut -f1 || echo "unknown")
+
+          # RXF content hash (download, strip <generated>, hash)
+          RXF_HASH=$(curl -sf https://przemienniki.net/export/rxf.xml | python3 -c "
+          import sys, hashlib, xml.etree.ElementTree as ET
+          data = sys.stdin.buffer.read()
+          try:
+              root = ET.fromstring(data)
+              gen = root.find('generated')
+              if gen is not None: root.remove(gen)
+              canonical = ET.tostring(root, encoding='unicode')
+              print(hashlib.sha256(canonical.encode()).hexdigest())
+          except:
+              print(hashlib.sha256(data).hexdigest())
+          " 2>/dev/null || echo "unknown")
+
+          FINGERPRINT="${MAPY73_HASH}-${RXF_HASH}"
+          echo "fingerprint=$FINGERPRINT" >> "$GITHUB_OUTPUT"
+          echo "Fingerprint: $FINGERPRINT"
+
+      - name: Check cached fingerprint
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: .fingerprint
+          key: fingerprint-${{ steps.fingerprint.outputs.fingerprint }}
+
+      - name: Decide whether to build
+        id: decide
+        run: |
+          TRIGGER="${{ github.event_name }}"
+          if [ "$TRIGGER" = "schedule" ] && [ "${{ steps.cache.outputs.cache-hit }}" = "true" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Skipping build: fingerprint unchanged (cron trigger)"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "${{ steps.fingerprint.outputs.fingerprint }}" > .fingerprint
+          fi
+
+      - name: Run pipeline
+        if: steps.decide.outputs.skip != 'true'
+        run: |
+          python -m src --work-dir work --output output/przemienniki_id52.csv --force
+          echo "### Build Report" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Fingerprint: \`${{ steps.fingerprint.outputs.fingerprint }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Trigger: \`${{ github.event_name }}\`" >> "$GITHUB_STEP_SUMMARY"
+          LINES=$(wc -l < output/przemienniki_id52.csv)
+          echo "- CSV rows: $((LINES - 1))" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish to GitHub Release
+        if: steps.decide.outputs.skip != 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest repeater database
+          body: |
+            Auto-generated CSV for Icom ID-52 import.
+
+            Fingerprint: `${{ steps.fingerprint.outputs.fingerprint }}`
+            Trigger: `${{ github.event_name }}`
+          files: output/przemienniki_id52.csv
+          make_latest: true

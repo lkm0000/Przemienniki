@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "przemienniki"
+version = "0.1.0"
+description = "Polish repeater database pipeline for Icom ID-52 import"
+requires-python = ">=3.11"
+license = "AGPL-3.0-only"
+dependencies = [
+    "PyYAML>=6.0",
+    "requests>=2.31",
+    "shapely>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
