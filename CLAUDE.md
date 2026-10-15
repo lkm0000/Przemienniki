@@ -71,4 +71,4 @@ pip install -e ".[dev]"
 ## CI/CD
 
 - `.github/workflows/test.yml` — pytest on PR/push (Python 3.11 + 3.12)
-- `.github/workflows/build.yml` — daily cron 03:17 UTC, workflow_dispatch, push to src/**, repository_dispatch. Fingerprint caching (skip if unchanged on cron). Publishes CSV to GitHub Release `latest`.
+- `.github/workflows/build.yml` — daily cron 01:17 UTC (03:17 CEST), workflow_dispatch, push to src/**, repository_dispatch. Fingerprint caching (skip if unchanged on cron). Publishes CSV to GitHub Release `latest`.

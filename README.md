@@ -9,7 +9,7 @@ Pipeline generujacy plik CSV z polskimi przemiennikami do importu w radiu Icom I
 
 ## Pobieranie CSV
 
-Najnowszy plik CSV dostepny jest w [GitHub Releases](../../releases/tag/latest) — budowany automatycznie codziennie o 03:17 UTC.
+Najnowszy plik CSV dostepny jest w [GitHub Releases](../../releases/tag/latest) — budowany automatycznie codziennie o 01:17 UTC (03:17 czasu letniego, 02:17 zimowego).
 
 ## Uzycie lokalne
 
